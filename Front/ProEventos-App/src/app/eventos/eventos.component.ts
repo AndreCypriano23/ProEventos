@@ -1,32 +1,42 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
+
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
+
+import { Evento } from '../models/Evento';
+import { EventoService } from '../services/evento.service';
 
 @Component({
   selector: 'app-eventos',
   templateUrl: './eventos.component.html',
   styleUrls: ['./eventos.component.scss']
+  //providers: [EventoService] Injeta dependencia root do service 2 forma
+  
 })
 export class EventosComponent implements OnInit {
+  modalRef!: BsModalRef;
 
-  public eventos: any = [];//eventos está associado agora, e pode ser chamado no bind
+  public eventos: Evento[] = [];//eventos está associado agora, e pode ser chamado no bind
   //any = []  significa que ele tem elementos vazio, ele é um array, pode ter length
-  public eventosFiltrados: any = [];
+  public eventosFiltrados: Evento[] = [];
 
-  larguraImagem: number = 150;
-  margemImagem: number = 2;
-  mostrarImagem: boolean = true;
-  private _filtroLista: string = '';
+  public larguraImagem: number = 150;
+  public margemImagem: number = 2;
+  public mostrarImagem: boolean = true;
+  private filtroListado: string = '';
 
   public get filtroLista(): string {
-    return this._filtroLista;
+    return this.filtroListado;
   }
 
   public set filtroLista(value: string) {
-    this._filtroLista = value;
+    this.filtroListado = value;
     this.eventosFiltrados = this.filtroLista ? this.filtrarEventos(this.filtroLista) : this.eventos;
   }
 
-  filtrarEventos(filtrarPor: string): any {
+  public filtrarEventos(filtrarPor: string): Evento[] {
     filtrarPor = filtrarPor.toLocaleLowerCase();
     return this.eventos.filter(
       ( evento: { tema: string; local: string; }) => evento.tema.toLocaleLowerCase().indexOf(filtrarPor) !== -1 ||
@@ -34,31 +44,62 @@ export class EventosComponent implements OnInit {
     );
   }
 
-  //podemos injetar o httpClient para buscar a API no método construtor
-  //Aqui criei uma variável com o nome http que tem o tipo HttpClient
-  constructor(private http: HttpClient) { }
 
-  ngOnInit(): void {
+  constructor(
+    private eventoService: EventoService, 
+    private modalService: BsModalService,
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService  
+    ) { }
+
+
+  public ngOnInit(): void {
     //Nós vamos chamar o nosso getEventos dentro do bgOnnit
     //ngOnInit é um método que vai ser chamado antes de iniciar a nossa aplicação, antes do html carregar
+    this.spinner.show();
     this.getEventos();
+
+       //setTimeout(() => {
+         /** spinner ends after 5 seconds */
+      
+       //}, 5000);
   }
 
-  alterarImagem(){
+  public alterarImagem(): void{
     this.mostrarImagem = !this.mostrarImagem;
     //Toda vez que eu clicar no botão eu vou receber o oposto
   }
 
 
   public getEventos(): void{
-    //No subscribe nós temos que se inscrever, que é um observable, é como se fosse um callback
-    this.http.get('https://localhost:5001/api/eventos').subscribe(
-      response => {
-        this.eventos = response,
+    //No subscribe nós temos que se inscrever, que é um observable, é como se fosse um callback 
+    this.eventoService.getEventos().subscribe(
+      (_eventos: Evento[]) => {
+        this.eventos = _eventos,
         this.eventosFiltrados = this.eventos
       },
-      error => console.log(error)
+      error => {
+        this.spinner.hide();
+        this.toastr.error('Erro ao Carregar os eventos', 'Erro!');
+      },
+      () => { 
+       this.spinner.hide();
+      }   
     );
+  }
+
+
+  openModal(template: TemplateRef<any>): void {
+    this.modalRef = this.modalService.show(template, {class: 'modal-sm'});
+  }
+
+  confirm(): void {
+    this.modalRef.hide();
+    this.toastr.success('O Evento foi deletado com sucesso!', 'Deletado');
+  }
+
+  decline(): void {
+    this.modalRef.hide();
   }
 
 }
