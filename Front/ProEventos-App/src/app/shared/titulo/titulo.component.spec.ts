@@ -12,7 +12,7 @@ describe('TituloComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ TituloComponent ]
-    })
+    })  
     .compileComponents();
   });
 
