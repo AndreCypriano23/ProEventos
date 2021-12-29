@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { Evento } from 'src/app/models/Evento';
-import { EventoService } from 'src/app/services/evento.service';
+import { Evento } from '@app/models/Evento';//usando com @, configurado no tsconfig, fica bem melhor
+import { EventoService } from 'src/app/services/evento.service';// sem usar o @app tendo que escrever todo o caminho
 
 @Component({
   selector: 'app-evento-lista',

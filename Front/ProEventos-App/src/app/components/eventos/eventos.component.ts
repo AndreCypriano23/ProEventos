@@ -1,12 +1,7 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-
-import { NgxSpinnerService } from 'ngx-spinner';
-import { ToastrService } from 'ngx-toastr';
-
-import { Evento } from '../../models/Evento';
-import { EventoService } from '../../services/evento.service';
+import { Evento } from '@app/models/Evento';//usando atalho @app ao inves de ../../
+import { EventoService } from '../../services/evento.service';//sem atalho
 
 @Component({
   selector: 'app-eventos',
