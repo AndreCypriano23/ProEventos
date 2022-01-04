@@ -5,25 +5,25 @@ import { RedeSocial } from "./RedeSocial";
 export interface Evento {
 
     //Vamos utilizar agora os multiplos cursores para montar a interface evento do Angular
-    id: number; 
-        
+    id: number;
+
     local: string;
 
-    dataEvento?: Date; 
+    dataEvento?: Date;
 
     tema: string;
 
-    qtdPessoas: number; 
+    qtdPessoas: number;
 
-    imagemURL: string; 
+    imagemURL: string;
 
-    telefone: string; 
+    telefone: string;
 
     email: string;
 
-    lotes: Lote[]; 
-    
-    redesSociais: RedeSocial[]; 
+    lotes: Lote[];
+
+    redesSociais: RedeSocial[];
 
     palestranteEventos: Palestrante[];
 

@@ -5,6 +5,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { Evento } from '@app/models/Evento';//usando com @, configurado no tsconfig, fica bem melhor
 import { EventoService } from 'src/app/services/evento.service';// sem usar o @app tendo que escrever todo o caminho
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-evento-lista',
@@ -18,6 +19,7 @@ export class EventoListaComponent implements OnInit {
   public eventos: Evento[] = [];//eventos está associado agora, e pode ser chamado no bind
   //any = []  significa que ele tem elementos vazio, ele é um array, pode ter length
   public eventosFiltrados: Evento[] = [];
+  public eventoId = 0;
 
   public larguraImagem: number = 150;
   public margemImagem: number = 2;
@@ -55,7 +57,7 @@ export class EventoListaComponent implements OnInit {
     //Nós vamos chamar o nosso getEventos dentro do bgOnnit
     //ngOnInit é um método que vai ser chamado antes de iniciar a nossa aplicação, antes do html carregar
     this.spinner.show();
-    this.getEventos();
+    this.carregarEventos();
 
        //setTimeout(() => {
          /** spinner ends after 5 seconds */
@@ -69,7 +71,7 @@ export class EventoListaComponent implements OnInit {
   }
 
 
-  public getEventos(): void{
+  public carregarEventos(): void{
     //No subscribe nós temos que se inscrever, que é um observable, é como se fosse um callback
     this.eventoService.getEventos().subscribe(
       (_eventos: Evento[]) => {
@@ -86,14 +88,37 @@ export class EventoListaComponent implements OnInit {
     );
   }
 
-
-  openModal(template: TemplateRef<any>): void {
+//quando clica em deletar abre o modal com a mensagem
+  openModal(event: any, template: TemplateRef<any>, eventoId: number): void {
+    event.stopPropagation();
+    this.eventoId = eventoId;
     this.modalRef = this.modalService.show(template, {class: 'modal-sm'});
   }
 
   confirm(): void {
     this.modalRef.hide();
-    this.toastr.success('O Evento foi deletado com sucesso!', 'Deletado');
+    this.spinner.show();
+
+    this.eventoService.deleteEvento(this.eventoId).subscribe(
+      (result: any) => {
+        if(result.message === 'Deletado'){
+          console.log(result);
+          this.toastr.success('O Evento foi deletado com sucesso!', 'Deletado');
+          this.spinner.hide();
+          this.carregarEventos();//carregando novamente os eventos.
+        }
+      },
+      (error: any) => {
+        this.toastr.error(`Erro ao tentar deletar o evento ${this.eventoId}`, 'Erro');
+        this.spinner.hide();
+        console.error(error);
+      },
+      () => this.spinner.hide(),
+    );
+
+
+
+
   }
 
   decline(): void {
