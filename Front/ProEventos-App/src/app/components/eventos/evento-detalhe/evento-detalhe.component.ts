@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, AbstractControlOptions, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { EventoService } from '@app/services/evento.service';
@@ -8,6 +8,7 @@ import { Evento } from '@app/models/Evento';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { NgxSpinner, NgxSpinnerService } from 'ngx-spinner';
 import { Toast, ToastrService } from 'ngx-toastr';
+import { Lote } from '@app/models/Lote';
 
 @Component({
   selector: 'app-evento-detalhe',
@@ -40,6 +41,10 @@ export class EventoDetalheComponent implements OnInit {
     };
   }
 
+  //get para adicionar mais lotes
+  get lotes(): FormArray{
+    return this.form.get('lotes') as FormArray;
+  }
 
   constructor(private fb: FormBuilder,
               private localeService: BsLocaleService,
@@ -89,25 +94,30 @@ export class EventoDetalheComponent implements OnInit {
       tema: [
         '', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]
       ],
-      local: [
-        '', Validators.required
-      ],
-      dataEvento: [
-         '', Validators.required
-      ],
-      qtdPessoas: [
-        '', [Validators.required, Validators.max(120000)]
-      ],
-      telefone: [
-        '', Validators.required
-      ],
+      local: [ '', Validators.required ],
+      dataEvento: [ '', Validators.required ],
+      qtdPessoas: [ '', [Validators.required, Validators.max(120000)] ],
+      telefone: [ '', Validators.required ],
       email: [
         '', [Validators.required, Validators.email]
       ],
-      imagemURL: [
-        '', Validators.required
-      ],
+      imagemURL: [ '', Validators.required ],
+      lotes: this.fb.array([])
+    });
+  }
 
+  adicionarLote(): void{
+    this.lotes.push(this.criarlote({id: 0} as Lote));//ele vai dar um push dentro de lotes para cada novo form de lotes que eu for inserir
+  }
+
+  criarlote(lote: Lote): FormGroup{
+    return this.fb.group({
+      id: [lote.id],
+      nome: [ lote.nome , Validators.required],
+      preco: [ lote.preco, Validators.required],
+      dataInicio: [ lote.dataInicio ],
+      dataFim: [ lote.dataFim ],
+      quantidade: [ lote.quantidade, Validators.required],
     });
   }
 
@@ -115,8 +125,8 @@ export class EventoDetalheComponent implements OnInit {
     this.form.reset();
   }
 
-  public cssValidator(campoForm: FormControl): any{
-    return {'is-invalid': campoForm.errors && campoForm.touched };
+  public cssValidator(campoForm: FormControl | AbstractControl): any {
+    return {'is-invalid': campoForm.errors && campoForm.touched};
   }
 
   public salvarAlteracao(): void{

@@ -40,8 +40,11 @@ namespace ProEventos.API
 
             //Toda vez que for requisitado um IEventoService, injete pf o eventoService
             services.AddScoped<IEventoService, EventoService>();
+            services.AddScoped<ILoteService, LoteService>();
+            
             services.AddScoped<IGeralPersist, GeralPersist>();
             services.AddScoped<IEventoPersist, EventoPersist>();
+            services.AddScoped<ILotePersist, LotePersist>();
             
 
             services.AddCors();
