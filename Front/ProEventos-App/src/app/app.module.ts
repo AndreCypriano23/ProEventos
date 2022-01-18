@@ -12,6 +12,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { ptBrLocale } from 'ngx-bootstrap/locale';
+import { NgxCurrencyModule } from 'ngx-currency';
 
 
 import { ToastrModule } from 'ngx-toastr';
@@ -76,7 +77,8 @@ defineLocale('pt-br', ptBrLocale);
       preventDuplicates: true,
       progressBar: true
     }),
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    NgxCurrencyModule
   ],
   providers: [
     //Aqui vc pode injetar todos os módulos que existem
