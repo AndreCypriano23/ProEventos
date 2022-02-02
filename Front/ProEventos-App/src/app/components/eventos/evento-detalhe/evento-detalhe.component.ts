@@ -11,6 +11,7 @@ import { Evento } from '@app/models/Evento';
 import { Lote } from '@app/models/Lote';
 import { LoteService } from '@app/services/lote.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { environment } from '@environments/environment';
 
 
 
@@ -30,6 +31,8 @@ export class EventoDetalheComponent implements OnInit {
   form!: FormGroup;
   estadoSalvar = 'post';
   loteAtual = {id:0, nome: '', indice: 0}
+  imagemURL = 'assets/upload-cloud.png';
+  file: File;
 
 get modoEditar(): boolean{
   //Se tiver no modo editar aparece, se for no 'novo' aí não
@@ -99,6 +102,10 @@ get modoEditar(): boolean{
         (evento: Evento) => {
           this.evento = {...evento} //estou pegando cada uma das propriedades do evento que recebi como parametro lá do getById lá da minha API e com esse tres pontos ...eventos eu atribui para dentro do meu evento
           this.form.patchValue(this.evento);//aqui copio o this.evento para cá
+          if(this.evento.imagemURL != ''){
+            this.imagemURL = environment.apiURL + 'resources/images/' + this.evento.imagemURL;
+
+          }
           this.evento.lotes.forEach(lote => {
             this.lotes.push(this.criarlote(lote));
           });
@@ -150,7 +157,7 @@ get modoEditar(): boolean{
       email: [
         '', [Validators.required, Validators.email]
       ],
-      imagemURL: [ '', Validators.required ],
+      imagemURL: [ '' ],
       lotes: this.fb.array([])
     });
   }
@@ -273,6 +280,34 @@ get modoEditar(): boolean{
 
   declineDeleteLote(): void{
     this.modalRef.hide();
+  }
+
+  onFileChange(ev: any): void{
+    const reader = new FileReader();
+    //mudando a imagem que aparece na tela
+    reader.onload = (event: any) => this.imagemURL = event.target.result;
+
+    //mudando o arquivo
+    this.file = ev.target.files;//vou inserir aqui todos os meus arquivos do input html
+
+    reader.readAsDataURL(this.file[0]);//posição 0 pq estou enviando apenas uma img
+    //veja que eu peguei os metodos do objeto FileReader e sobrescrevi-los para poder alterar a foto
+
+    this.uploadImagem();
+  }
+
+  uploadImagem(): void{
+    this.spinner.show();
+    this.eventoService.postUpload(this.eventoId, this.file).subscribe(
+      () => {
+        this.carregarEvento();//vou carregar o evento pq eu acabei de alterar o evento, lá no back vc altera o nome do campo ImageURL
+        this.toastr.success('Imagem atualizada com Sucesso', 'Sucesso!');
+      },
+      (error: any) => {
+        this.toastr.error('Erro ao fazer o upload de imagem', 'Erro!');
+        console.log(error);
+      }
+    ).add(() => this.spinner.hide());
   }
 
 }

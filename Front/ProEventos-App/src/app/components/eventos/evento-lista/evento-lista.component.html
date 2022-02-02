@@ -50,7 +50,8 @@ que eu tenho, como se fosse um foreach  -->
       <!-- Só vai aparecer se o tiver o objeto eventos e esse .length significa que ele existe E TEM ITENS-->
       <tr *ngFor="let evento of eventosFiltrados" (click)="detalheEvento(evento.id)" style="cursor:pointer;">
         <td class="d-none d-md-table-cell">
-          <img [collapse]="mostrarImagem" [isAnimated]="true" src="/assets/{{evento.imagemURL}}"
+          <img [collapse]="mostrarImagem" [isAnimated]="true"
+            [src]="mostraImagem(evento.imagemURL)"
             [style.width.px]="larguraImagem" [style.margin.px]="margemImagem" alt="">
         </td>
         <td>{{evento.id}}</td>

@@ -12,6 +12,9 @@ using ProEventos.Persistence.Contextos;
 using ProEventos.Persistence.Contratos;
 using AutoMapper;
 using System;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace ProEventos.API
 {
@@ -73,6 +76,13 @@ namespace ProEventos.API
             app.UseCors(x => x.AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowAnyOrigin());
+
+            
+            //vamos adicionar uma funcionalidade para podermos salvar as imagens aqui no projeto
+            app.UseStaticFiles(new StaticFileOptions(){
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
+                RequestPath = new PathString("/Resources")
+            }); 
 
             app.UseEndpoints(endpoints =>
             {

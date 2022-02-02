@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Evento } from '@app/models/Evento';//usando com @, configurado no tsconfig, fica bem melhor
 import { EventoService } from 'src/app/services/evento.service';// sem usar o @app tendo que escrever todo o caminho
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-evento-lista',
@@ -127,6 +128,12 @@ export class EventoListaComponent implements OnInit {
 
   detalheEvento(id: number): void {
     this.router.navigate([`eventos/detalhe/${id}`]);
+  }
+
+  public mostraImagem(imagemURL: string): string{
+    return (imagemURL != '')
+    ? `${environment.apiURL}resources/images/${imagemURL}`
+    : 'assets/sem-imagem.png';
   }
 
 

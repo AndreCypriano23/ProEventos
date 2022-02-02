@@ -2,6 +2,7 @@ import { Evento } from './../models/Evento';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '@environments/environment';
 
 
 @Injectable(
@@ -10,7 +11,7 @@ import { Observable } from 'rxjs';
     //{ providedIn: 'root'}pode injetar usando o root ou se outra forma
 )
 export class EventoService {
-  baseURL = 'https://localhost:5001/api/eventos';
+  baseURL =  environment.apiURL + 'api/eventos';
 
   //podemos injetar o httpClient para buscar a API no método construtor
   //Aqui criei uma variável com o nome http que tem o tipo HttpClient
@@ -39,5 +40,15 @@ export class EventoService {
   public deleteEvento(id: number): Observable<any>{
     return this.http.delete(`${this.baseURL}/${id}`);
   }
+
+  postUpload(eventoId: number, file: File): Observable<Evento>{
+    const fileToUpload = file[0] as File;
+    const formData = new FormData();
+    formData.append('file', fileToUpload);
+
+    return this.http.post<Evento>(`${this.baseURL}/upload-image/${eventoId}`, formData);
+
+  }
+
 
 }
