@@ -43,7 +43,7 @@ namespace ProEventos.Persistence.Migrations
                     b.Property<string>("Tema")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("imagemURL")
+                    b.Property<string>("ImagemURL")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

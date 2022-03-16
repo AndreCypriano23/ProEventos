@@ -2,19 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProEventos.Persistence.Contextos;
 
 namespace ProEventos.Persistence.Migrations
 {
     [DbContext(typeof(ProEventosContext))]
-    partial class ProEventosContextModelSnapshot : ModelSnapshot
+    [Migration("20211030230039_Adicionando-Identity")]
+    partial class AdicionandoIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.9");
+                .HasAnnotation("ProductVersion", "5.0.2");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
@@ -299,9 +301,6 @@ namespace ProEventos.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ImagemURL")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("MiniCurriculo")
                         .HasColumnType("TEXT");
 
@@ -327,7 +326,7 @@ namespace ProEventos.Persistence.Migrations
 
                     b.HasIndex("PalestranteId");
 
-                    b.ToTable("PalestranteEventos");
+                    b.ToTable("PalestrantesEventos");
                 });
 
             modelBuilder.Entity("ProEventos.Domain.RedeSocial", b =>
@@ -448,13 +447,13 @@ namespace ProEventos.Persistence.Migrations
             modelBuilder.Entity("ProEventos.Domain.PalestranteEvento", b =>
                 {
                     b.HasOne("ProEventos.Domain.Evento", "Evento")
-                        .WithMany("PalestranteEventos")
+                        .WithMany("PalestrantesEventos")
                         .HasForeignKey("EventoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ProEventos.Domain.Palestrante", "Palestrante")
-                        .WithMany("PalestranteEventos")
+                        .WithMany("PalestrantesEventos")
                         .HasForeignKey("PalestranteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -467,12 +466,12 @@ namespace ProEventos.Persistence.Migrations
             modelBuilder.Entity("ProEventos.Domain.RedeSocial", b =>
                 {
                     b.HasOne("ProEventos.Domain.Evento", "Evento")
-                        .WithMany("RedesSociais")
+                        .WithMany("RedeSociais")
                         .HasForeignKey("EventoId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ProEventos.Domain.Palestrante", "Palestrante")
-                        .WithMany("RedesSociais")
+                        .WithMany("RedeSociais")
                         .HasForeignKey("PalestranteId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -485,9 +484,9 @@ namespace ProEventos.Persistence.Migrations
                 {
                     b.Navigation("Lotes");
 
-                    b.Navigation("PalestranteEventos");
+                    b.Navigation("PalestrantesEventos");
 
-                    b.Navigation("RedesSociais");
+                    b.Navigation("RedeSociais");
                 });
 
             modelBuilder.Entity("ProEventos.Domain.Identity.Role", b =>
@@ -502,9 +501,9 @@ namespace ProEventos.Persistence.Migrations
 
             modelBuilder.Entity("ProEventos.Domain.Palestrante", b =>
                 {
-                    b.Navigation("PalestranteEventos");
+                    b.Navigation("PalestrantesEventos");
 
-                    b.Navigation("RedesSociais");
+                    b.Navigation("RedeSociais");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using ProEventos.Application.Dtos;
 
 namespace Back.src.ProEventos.Aplication.Dtos
 {
@@ -24,7 +25,7 @@ namespace Back.src.ProEventos.Aplication.Dtos
 
         [RegularExpression(@".*\.(gif|jpe?g|bmp|png)$",
                 ErrorMessage = "Não é uma imagem válida. (gif, jpg, jpeg, bmp ou png)")]
-        public string imagemURL { get; set; }
+        public string ImagemURL { get; set; }
 
         [Required(ErrorMessage = "O campo {0} é obrigatório")]    
         [Phone(ErrorMessage = "O campo {0} está com o número inválido")]
@@ -36,6 +37,10 @@ namespace Back.src.ProEventos.Aplication.Dtos
         ]
         public string Email { get; set; }
 
+        public int UserId { get; set; }
+        
+        public UserDto UserDto { get; set; }
+        
         public IEnumerable<LoteDto> Lotes { get; set; }     
         public IEnumerable<RedeSocialDto> RedesSociais { get; set; }
 
