@@ -151,7 +151,9 @@ namespace ProEventos.API
             app.UseCors(x => x.AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowAnyOrigin());
+              
 
+        app.UseHttpsRedirection(); 
             
             //vamos adicionar uma funcionalidade para podermos salvar as imagens aqui no projeto
             app.UseStaticFiles(new StaticFileOptions(){

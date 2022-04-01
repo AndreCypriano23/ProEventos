@@ -33,7 +33,7 @@
               class="form-control is-invalid"
               [ngClass]="cssValidator(f.local)"
               formControlName="local"
-               placeholder="Insira o Local" [(ngModel)] = "evento.tema">
+               placeholder="Insira o Local" [(ngModel)] = "evento.local">
               <div *ngIf="f.local.errors?.required" class="invalid-feedback">
                 Local obrigatório
               </div>

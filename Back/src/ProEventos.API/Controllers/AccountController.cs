@@ -58,7 +58,12 @@ namespace ProEventos.API.Controllers
 
                 var user = await _accountService.CreateAccountAsync(userDto);
                 if(user != null)
-                    return Ok(user);
+                    return Ok( new 
+                  {
+                      userName = user.UserName,
+                      PrimeiroNome = user.PrimeiroNome,
+                      token = _tokenService.CreateToken(user).Result
+                  });
 
                 return BadRequest("Usuário não criado, tente novamente mais tarde!");    
 
@@ -105,6 +110,12 @@ namespace ProEventos.API.Controllers
         {
             try
             {
+                if(userUpdateDto.UserName != User.GetUserName())
+                {
+                    //caso o cara passe um usuário que seja diferente do TOKEN por ex.
+                    return Unauthorized("Usuário é Inválido");
+                }
+
                 //eu nao preciso perguntar se ele existe, eu tenho que pegar ele
 
                 //Só posso atualizar meu usuário baseado no meu token, essa é a forma mais correta de fazer
@@ -114,7 +125,13 @@ namespace ProEventos.API.Controllers
                 var userReturn = await _accountService.UpdateAccount(userUpdateDto);
                 if(userReturn == null)  return NoContent();
 
-                return Ok(userReturn);    
+                return Ok(
+                    new {
+                        userName = userReturn.UserName,
+                        PrimeiroNome = userReturn.PrimeiroNome,
+                        token = _tokenService.CreateToken(userReturn).Result
+                    }
+                );    
 
             }
             catch(Exception ex)
@@ -123,6 +140,7 @@ namespace ProEventos.API.Controllers
                 $"Erro ao tentar Atualizar o Usuário. Erro: {ex.Message}");
             }
         }
+        
 
 
 

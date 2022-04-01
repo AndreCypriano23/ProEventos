@@ -117,9 +117,6 @@ export class EventoListaComponent implements OnInit {
       () => this.spinner.hide(),
     );
 
-
-
-
   }
 
   decline(): void {

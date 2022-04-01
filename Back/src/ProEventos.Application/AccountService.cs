@@ -47,7 +47,7 @@ namespace ProEventos.Application
             throw new System.NotImplementedException();
         }
 
-        public async Task<UserDto> CreateAccountAsync(UserDto userDto)
+        public async Task<UserUpdateDto> CreateAccountAsync(UserDto userDto)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace ProEventos.Application
                 if(result.Succeeded)
                 {
                     //deu certo, entao vao mapear denovo, ao contrário
-                    var userToReturn = _mapper.Map<UserDto>(user);
+                    var userToReturn = _mapper.Map<UserUpdateDto>(user);
                     //veja lá no nome do método, no 'async Task<UserDto>', nao vai retornar um UserDto? 
                     //entao, tem que retornar ele, por isso que mapeamos de volta
                     //assim eu nao vou expor para a minha API o meu domínio a API só sabe o que está dentro do meu aplication
@@ -101,14 +101,20 @@ namespace ProEventos.Application
                 var user = await _userPersist.GetUserByUserNameAsync(userUpdateDto.UserName);
                 if(user == null) return null;
 
+                userUpdateDto.Id = user.Id;//para nao ficar null no front
+
+
                 //Se eu encontro eu mapeio ele com o userUpdateDto, entao o user fica com tudo do userUpdateDto
                 _mapper.Map(userUpdateDto, user);
 
-                //A primeira coisa que tenho que fazer antes de atualizar é dar um reset no password
-               
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var result = await _userManager.ResetPasswordAsync(user, token, userUpdateDto.Password);
 
+                //A primeira coisa que tenho que fazer antes de atualizar é dar um reset no password
+               //Nem sempre passamos senha, entao
+               if(userUpdateDto.Password != null){
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    await _userManager.ResetPasswordAsync(user, token, userUpdateDto.Password);
+               }
+               
                 _userPersist.Update<User>(user);
 
                 if(await _userPersist.SaveChangesAsync())
