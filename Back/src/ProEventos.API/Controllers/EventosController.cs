@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using System.Linq;
 using ProEventos.API.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using ProEventos.Persistence.paginacao;
 
 namespace ProEventos.API.Controllers
 {
@@ -35,13 +36,17 @@ namespace ProEventos.API.Controllers
         //Isso é uma rota
         [HttpGet]
         //IActionResult é bom pq ele resulta o status code do http, 404, 200, 500, 300
-        public async Task<IActionResult> Get()
+        //É a persistencia que vai nos dizer qual é a necessidade que temos com relação a paginação
+        public async Task<IActionResult> Get([FromQuery]PageParams pageParams)
         {
             try 
             {
-                var eventos = await _eventoService.GetAllEventosAsync(User.GetUserId(), true);//quando bater nessa linha, ele TEM QUE TER O TOKEN, SENAO ELE NAO PODE BATER NESSA LINHA
-
+                var eventos = await _eventoService.GetAllEventosAsync(User.GetUserId(), pageParams, true);//quando bater nessa linha, ele TEM QUE TER O TOKEN, SENAO ELE NAO PODE BATER NESSA LINHA
                 if(eventos ==  null) return NoContent();  
+
+                //Header da resposta com a paginação
+                Response.AddPagination(eventos.CurrentPage, eventos.PageSize, eventos.TotalCount, 
+                        eventos.TotalPages);
                             
                 //usando dto quem está consumindo nao tem noção dos outros campos, ele nao tem acesso direto ao meu domínio
                 return Ok(eventos);
@@ -60,23 +65,6 @@ namespace ProEventos.API.Controllers
             try 
             {
                 var evento = await _eventoService.GetEventoByIdAsync(User.GetUserId(), id, true);
-                if(evento ==  null) return NoContent();
-
-                return Ok(evento);
-            }
-            catch(Exception ex)
-            {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar recuperar eventos. Erro: {ex.Message}");
-            }
-        }
-
-        [HttpGet("{tema}/tema")]
-        public async Task<IActionResult> GetByTema(string tema)
-        {
-            try 
-            {
-                var evento = await _eventoService.GetAllEventosByTemaAsync(User.GetUserId(), tema, true);
                 if(evento ==  null) return NoContent();
 
                 return Ok(evento);

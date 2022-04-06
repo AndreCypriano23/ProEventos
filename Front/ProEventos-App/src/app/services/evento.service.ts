@@ -1,9 +1,10 @@
 import { Evento } from './../models/Evento';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
-import { take } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
+import { PaginatedResult } from '@app/models/Pagination';
 
 
 @Injectable(
@@ -25,14 +26,36 @@ export class EventoService {
 
   //vou criar um Interceptor, que vai interceptar qq requisição HTTP QUE ESTIVER na aplicação
   //o interceptor vai clonar esse requisição, add ao header
-  public getEventos(): Observable<Evento[]>{
+  public getEventos(page?: number, itemsPerPage?: number, term?: string): Observable<PaginatedResult<Evento[]>>{
+      const paginatedResult: PaginatedResult<Evento[]> = new PaginatedResult<Evento[]>();
 
-      return this.http.get<Evento[]>(this.baseURL).pipe(take(1));
+      let params = new HttpParams;
+      //Baseado nesse parametro eu quero saber se eu posso criar um pageNumber ou PageSize
+
+      if(page != null && itemsPerPage != null){
+        params = params.append('pageNumber', page.toString());
+        params = params.append('pageSize', itemsPerPage.toString());
+      }
+
+      if(term != null && term != ''){
+        params = params.append('term', term);
+      }
+
+      return this.http.get<Evento[]>(this.baseURL, { observe: 'response', params })
+      .pipe(
+       take(1),
+       map((response) => {
+          paginatedResult.result = response.body;
+          if(response.headers.has('Pagination')){
+            paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
+          }
+          return paginatedResult;
+        }));
   }
 
-  public getEventosByTema(tema: string): Observable<Evento[]>{
+  /*public getEventosByTema(tema: string): Observable<Evento[]>{
     return this.http.get<Evento[]>(`${this.baseURL}/${tema}/tema`).pipe(take(1));
-  }
+  }*/
 
   public getEventoById(id: number): Observable<Evento>{
     return this.http.get<Evento>(`${this.baseURL}/${id}`).pipe(take(1));

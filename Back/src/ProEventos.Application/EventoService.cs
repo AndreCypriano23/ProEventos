@@ -5,6 +5,7 @@ using Back.src.ProEventos.Aplication.Dtos;
 using ProEventos.Application.Contratos;
 using ProEventos.Domain;
 using ProEventos.Persistence.Contratos;
+using ProEventos.Persistence.paginacao;
 
 namespace ProEventos.Application
 {
@@ -112,18 +113,25 @@ namespace ProEventos.Application
             
         }
 
-        public async Task<EventoDto[]> GetAllEventosAsync(int userId, bool includePalestrantes = false)
+        public async Task<PageList<EventoDto>> GetAllEventosAsync(int userId, PageParams pageParams, bool includePalestrantes = false)
         {
        
             try
             {
 
-                var eventos  = await _eventoPersist.GetAllEventosAsync(userId, includePalestrantes);
+                var eventos  = await _eventoPersist.GetAllEventosAsync(userId, pageParams, includePalestrantes);
                 
                 if(eventos == null)  return null;
 
-                var resultado = _mapper.Map<EventoDto[]>(eventos);
-    
+                var resultado = _mapper.Map<PageList<EventoDto>>(eventos);//vai retornar meus eventos paginados
+
+                //Mapeando na mão
+                resultado.CurrentPage = eventos.CurrentPage;
+                //aí além desse, vou dentro do pageList e para cada uma dos parametros e vou mapear
+                resultado.TotalPages = eventos.TotalPages;
+                resultado.TotalCount = eventos.TotalCount;
+                resultado.PageSize = eventos.PageSize;
+
                 return resultado;
 
             }
@@ -132,26 +140,6 @@ namespace ProEventos.Application
                 throw new Exception(ex.Message);
             }
             
-
-        }
-
-        public async Task<EventoDto[]> GetAllEventosByTemaAsync(int userId, string tema, bool includePalestrantes = false)
-        {
-            try
-            {
-
-                var eventos  = await _eventoPersist.GetAllEventosByTemaAsync(userId, tema, includePalestrantes);
-                if(eventos == null) return null;             
-
-                var resultado = _mapper.Map<EventoDto[]>(eventos); 
-    
-                return resultado;
-                
-            }
-            catch(Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
 
         }
 
